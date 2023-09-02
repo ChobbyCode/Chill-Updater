@@ -3,11 +3,16 @@ using System.Runtime.InteropServices;
 using System.IO.Compression;
 using Newtonsoft;
 using Newtonsoft.Json.Linq;
+using UC_Update_Downloader;
+using Newtonsoft.Json;
+using System.Security.Principal;
 
 namespace UC_Update_Downloader
 {
     public class Program
     {
+        // Fr this is like the messiest code I've ever written lol..
+
         private const int MF_BYCOMMAND = 0x00000000;
         public const int SC_CLOSE = 0xF060;
         public const int SC_MINIMIZE = 0xF020;
@@ -49,18 +54,18 @@ namespace UC_Update_Downloader
 
 
 
-            Console.Title = "UC-Updator | ChobbyCode";
+            Console.Title = "Chill Update V0.1.0 | ChobbyCode";
 
             var text = @"
-             _   _           _       _
-            | | | |         | |     | |  V0.1.0
-            | | | |____   __| | __,_| |_  ___
-            | | | | ._ \ / _. |/ _  | __|/ _ \
-            | |_| | |_) | (_| | (_| | |_|  __/  _  _
-             \___/| .__/ \__._|\__,_|\__|\__(_)(_)(_)
-                  | |                     
-                  | |
-                  |_|
+             ___ _    _ _   _      _   _           _       _
+            / __| |  (_) | | |    | | | |         | |     | |  V0.1.0
+            | | | |__ _| | | |    | | | |____   __| | __,_| |_  ___
+            | | |    | | | | |    | | | | ._ \ / _. |/ _  | __|/ _ \
+            | |_| || | | |_| |._  | |_| | |_) | (_| | (_| | |_|  __/  _  _
+            \___|_||_|_|___|__(_)  \___/| .__/ \__._|\__,_|\__|\__(_)(_)(_)
+                                        | |                     
+                                        | |
+                                        |_|
 
             ";
 
@@ -70,22 +75,42 @@ namespace UC_Update_Downloader
 
             Console.ForegroundColor = ConsoleColor.Blue;
 
-            Console.WriteLine("Credits: ChobbyCode (Application), DanielSWolf (Progress Bar)");
+            Console.WriteLine("             Credits: ChobbyCode (Application), DanielSWolf (Progress Bar)");
             Console.ForegroundColor = ConsoleColor.Cyan;
-            Console.WriteLine("https://gist.github.com/DanielSWolf/0ab6a96899cc5377bf54");
+            Console.WriteLine("               https://gist.github.com/DanielSWolf/0ab6a96899cc5377bf54");
             Console.WriteLine();
 
             Console.ForegroundColor = ConsoleColor.White;
 
 
-            downloader();
+            string basePath = AppDomain.CurrentDomain.BaseDirectory;
+            string openDir = basePath;
 
-            Console.ReadLine();
 
+
+            string configFileLoc = Path.GetFullPath(Path.Combine(basePath, @"..\")) + @"\_config.json";
+            if (File.Exists(configFileLoc))
+            {
+                // If this is a run from config app then you can do the install
+                downloaderFromConfig(configFileLoc);
+            }
+            else
+            {
+
+                UCCommandLine commandLine = new UCCommandLine();
+
+                commandLine.newCommandLine();
+
+            }
         }
 
-        public static void downloader()
+        public static void downloaderFromConfig(string configFileLoc)
         {
+            string configText = File.ReadAllText(configFileLoc);
+
+            ConfigFile configJSON = JsonConvert.DeserializeObject<ConfigFile>(configText);
+
+
             string basePath = AppDomain.CurrentDomain.BaseDirectory;
             string fullPath = basePath + "\\.zip\\download.zip";
 
@@ -93,7 +118,7 @@ namespace UC_Update_Downloader
             deleteDir("\\temp");
             newDir(basePath + "\\temp");
 
-            string path = "https://github.com/ChobbyCode/GithubApiTest/zipball/Download";
+            string path = configJSON.URL + @"/zipball/Download";
             Console.Write("Fetching Data From: ");
             Console.ForegroundColor = ConsoleColor.Cyan;
             Console.WriteLine(path);
@@ -112,7 +137,7 @@ namespace UC_Update_Downloader
             Console.WriteLine();
             Console.WriteLine("Extracting Contents..");
 
-            if(Directory.GetDirectories(basePath + "\\temp").Count() > 1)
+            if (Directory.GetDirectories(basePath + "\\temp").Count() > 1)
             {
                 Console.ForegroundColor = ConsoleColor.Red;
                 Console.WriteLine("Failed To Extract");
@@ -123,13 +148,14 @@ namespace UC_Update_Downloader
             else
             {
                 string fileLoc = "";
-                foreach(string dir in Directory.GetDirectories(basePath + "temp"))
+                foreach (string dir in Directory.GetDirectories(basePath + "temp"))
                 {
                     Console.WriteLine(dir);
                     fileLoc = dir;
                 }
 
-                if(!File.Exists(fileLoc + "\\uc_config.json")) {
+                if (!File.Exists(fileLoc + "\\uc_config.json"))
+                {
                     //Return if the file doesn't exist
                     Console.ForegroundColor = ConsoleColor.Red;
                     Console.WriteLine("Failed To Extract");
@@ -191,6 +217,19 @@ namespace UC_Update_Downloader
                         {
                             string newPath = Path.GetFullPath(Path.Combine(basePath, @"..\"));
 
+                            string fileEnd = "";
+                            string character = "";
+                            int val = 2;
+                            while (val < info!.From.Length)
+                            {
+                                character = info!.From[val].ToString();
+
+                                fileEnd = fileEnd + character;
+
+                                val++;
+                            }
+
+                            newPath = newPath + fileEnd;
 
                             Console.WriteLine(" Complete.");
 
@@ -224,6 +263,19 @@ namespace UC_Update_Downloader
                         {
                             string newPath = Path.GetFullPath(Path.Combine(basePath, @"..\"));
 
+                            string fileEnd = "";
+                            string character = "";
+                            int val = 2;
+                            while (val < info!.To.Length)
+                            {
+                                character = info!.To[val].ToString();
+
+                                fileEnd = fileEnd + character;
+
+                                val++;
+                            }
+
+                            newPath = newPath + fileEnd;
 
                             Console.WriteLine(" Complete.");
 
@@ -233,20 +285,24 @@ namespace UC_Update_Downloader
 
                 }
 
-                Console.WriteLine("Cheese");
-
                 int i = 0;
-                foreach(string location in fromFiles)
+                foreach (string location in fromFiles)
                 {
                     Console.WriteLine(location);
 
                     string endPath = toFiles[i];
                     Console.WriteLine(endPath);
 
+                    if (!Directory.Exists(endPath))
+                    {
+                        newDir(endPath);
+                    }
+
                     try
                     {
                         File.Copy(location, endPath + fileNames[i], true);
-                    }catch(Exception e)
+                    }
+                    catch (Exception e)
                     {
                         Console.WriteLine(e);
                     }
