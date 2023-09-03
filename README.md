@@ -30,6 +30,11 @@ The basic JSON template is listed below:
                 "From": "*/README.md",
                 "To": "../"
             }
+        ],
+        "Delete": [
+            {
+                "Location": "../AnOldExe.exe"
+            }
         ]
     }
 }
