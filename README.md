@@ -17,6 +17,8 @@ If you have not already created a github repo for your project, create a github 
 
 In the "Download" branch create a new file UC_config.json, this is the last thing we need to do to setup Chill.
 
+## Usage 
+
 The basic JSON template is listed below:
 
 ```json
@@ -48,7 +50,12 @@ Below is a example of a peice from the data part.
 
 ```
 
-In the file name part we specify what the name of the file is. In the from we specify where the file is moving from and then in to we specify where the files will be moving to.
+In the file name part we specify what the name of the file is. In the "from" we specify where the file is moving from and then in "to" we specify where the files will be moving to.
+
+> #### To get files out of the download we use '*'
+> #### To get files out of the main application folder we use '..'
+
+For example if we want to move the README file from the downloads to the main application folder we set the JSON up as below:
 
 ```json
 {
@@ -58,19 +65,33 @@ In the file name part we specify what the name of the file is. In the from we sp
                 "FileName": "README.md",
                 "From": "*/README.md",
                 "To": "../"
-            },
-
-            {
-                "FileName": "Another-File.txt",
-                "From": "*/Another-File.txt",
-                "To": "../A Folder/"
             }
         ]
     }
 }
 ```
 
-You can also move files around from the main directory
+The JSON above takes the README file in the downloads and puts it the main program.
+
+We can create new folders by just putting a new directory before where we access.
+
+```json
+{
+    "ExtractInfo": {
+        "Data": [
+            {
+                "FileName": "README.md",
+                "From": "*/README.md",
+                "To": "../Important/"
+            }
+        ]
+    }
+}
+```
+
+The JSON above takes the README.md and puts it in a new folder called Important.
+
+If there is a file in the main directory and we want to move it into a new folder we can do this as seen below:
 
 ```json
 {
@@ -80,6 +101,52 @@ You can also move files around from the main directory
                 "FileName": "README.md",
                 "From": "../README.md",
                 "To": "../UsefulInformation/"
+            }
+        ]
+    }
+}
+```
+
+Above takes the README file in the main directory and puts it in a new folder called UsefulInformation
+
+### Deleting Old Files
+
+We can delete files by just specifying the location of the file.
+
+```json
+"Delete": [
+  {
+    "Location": "../README.md"
+  }
+]
+```
+
+The code above deletes the file README.md in the main program directory
+
+## Example
+
+Below is a full example of the JSON that will move a LICENSE file into a Important folder and add a new file to main directory called README.md and delete a old exe file.
+
+```json
+{
+    "ExtractInfo": {
+        "Data": [
+            {
+                "FileName": "LICENSE.txt",
+                "From": "../LICENSE.txt",
+                "To": "../Important/"
+            },
+            
+
+            {
+                "FileName": "README.md",
+                "From": "*/README.md",
+                "To": "../"
+            }
+        ],
+        "Delete": [
+            {
+                "Location": "../AnOldExe.exe"
             }
         ]
     }
