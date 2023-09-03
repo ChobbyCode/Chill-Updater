@@ -169,13 +169,80 @@ namespace UC_Update_Downloader
                 JObject ConfigData = JObject.Parse(JSONText);
 
                 IList<JToken> locationInfo = ConfigData["ExtractInfo"]["Data"].Children().ToList();
+                IList<JToken> deleteInfoJSON = ConfigData["ExtractInfo"]["Delete"].Children().ToList();
 
                 IList<InstallInfo> moveInfo = new List<InstallInfo>();
+                IList<InstallInfo> deleteInfo = new List<InstallInfo>();
                 foreach (JToken result in locationInfo)
                 {
                     // JToken.ToObject is a helper method that uses JsonSerializer internally
-                    InstallInfo searchResult = result.ToObject<InstallInfo>();
-                    moveInfo.Add(searchResult);
+                    InstallInfo moveResult = result.ToObject<InstallInfo>();
+                    moveInfo.Add(moveResult);
+                }
+
+                foreach (JToken result in deleteInfoJSON)
+                {
+                    InstallInfo deleteResult = result.ToObject<InstallInfo>();
+                    deleteInfo.Add(deleteResult);
+                }
+
+                // Deleting Files
+                List<string> deleteNames = new List<string>();
+
+                Console.WriteLine("Deleting Files");
+                foreach (InstallInfo info in deleteInfo)
+                {
+                    Console.WriteLine("Deleting File: " + info.Location);
+
+                    if (info!.Location[0].ToString() == "*")
+                    {
+                        //This is the easiest one lol
+                        string fileEnd = "";
+                        string character = "";
+                        int val = 2;
+                        while (val < info!.Location.Length)
+                        {
+                            character = info!.Location[val].ToString();
+
+                            fileEnd = fileEnd + character;
+
+                            val++;
+                        }
+
+                        Console.WriteLine(" Complete.");
+
+                        deleteNames.Add(fileLoc + @"\" + fileEnd);
+                    }
+                    else
+                    {
+                        if (info!.Location[0].ToString() + info!.Location[1].ToString() == "..")
+                        {
+                            string newPath = Path.GetFullPath(Path.Combine(basePath, @"..\"));
+
+                            string fileEnd = "";
+                            string character = "";
+                            int val = 3;
+                            while (val < info!.Location.Length)
+                            {
+                                character = info!.Location[val].ToString();
+
+                                fileEnd = fileEnd + character;
+
+                                val++;
+                            }
+
+                            newPath = newPath + fileEnd;
+
+                            Console.WriteLine(" Complete.");
+
+                            deleteNames.Add(newPath);
+                        }
+                    }
+                }
+
+                foreach (string delete in deleteNames)
+                {
+                    File.Delete(delete);
                 }
 
                 List<string> fromFiles = new List<string>();

@@ -12,6 +12,7 @@ namespace UC_Update_Downloader
         public string From { get; set; }
         public string To { get; set; }
         public string FileName { get; set; }
-        
+        public string Location { get; set; }
+
     }
 }
