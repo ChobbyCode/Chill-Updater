@@ -1,4 +1,6 @@
-﻿using ChillAPI.Utilities.Internal.Downloaders;
+﻿// Copyright (c) 2024-Present ChobbyCode
+
+using ChillAPI.Utilities.Internal.Downloaders;
 using Newtonsoft.Json;
 
 namespace ChillAPI.Utilities.UpdateClient;

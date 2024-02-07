@@ -1,4 +1,6 @@
-﻿
+﻿// Copyright (c) 2024-Present ChobbyCode
+
+
 namespace ChillAPI;
 
 internal class GlobalVariables

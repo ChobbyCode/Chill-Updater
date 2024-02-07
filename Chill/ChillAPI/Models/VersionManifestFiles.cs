@@ -1,4 +1,5 @@
-﻿
+﻿// Copyright (c) 2024-Present ChobbyCode
+
 namespace ChillAPI.Models;
 
 public class VersionManifestFile

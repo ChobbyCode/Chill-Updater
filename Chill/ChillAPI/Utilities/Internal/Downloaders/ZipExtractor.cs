@@ -1,4 +1,5 @@
-﻿
+﻿// Copyright (c) 2024-Present ChobbyCode
+
 using System.IO.Compression;
 
 namespace ChillAPI.Utilities.Internal.Downloaders;
